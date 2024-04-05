@@ -1,5 +1,5 @@
 # auto-fish-feeder
-An auto fish feeding machine mostly built with an Arduino UNO Rev.3, a plastic toy parts, which I "borrowed" from my 7 year-old-son, a micro servo (SG90) and an obsoleted credit card ;-)
+An auto fish feeding machine mostly built with an Arduino UNO Rev.3, a plastic toy parts, which I _"borrowed"_ from my 7 year-old-son, a micro servo (SG90) and an obsoleted credit card ;-)
 
 ## behind-the-scenes story...
 We will be on a trip for a week or so. During that time, we will need _"someone"_ to take care of our lovely fish by feeding them every 4 or 5 days. 
