@@ -41,7 +41,7 @@
 #ifdef DEBUG
 #define FEED_INTERVAL 5000      // [ms] Automatic feed interval for debugging purpose
 #else
-#define FEED_INTERVAL (5 * 24 * 60 * 60 * 1000)      // [ms] Automatic feed interval for normal operation
+#define FEED_INTERVAL 259200000 // [ms] Automatic feed interval for normal operation
 #endif
 #define SERVO_TIME 10           // [ms/degree] servo horn movement wait time per degree
 
