@@ -12,13 +12,16 @@ We have a rough plan as the following to get everything done by the end of upcom
 1. Before taking a deep dive into the "physical" real world of electronics, we would like to _"safely"_ prototyping our concept with the help of online simulator such as [Wokwi](https://wokwi.com/).
 2. Take whatever we have prototyped in the virtual world to the real world after making sure everything is going to work as expected.
 3. Perform a few fine tuning and/or necessary hardware and software adjustments before finish it off.
-
 ## System design and features
 The following diagram describes both the hardware components and software features which consist of the auto-fish-feeder system.
 
 ![Auto Fish Feeder system diagram](images/aff-block-diagram.svg)
 
 ## Wokwi demo
+Would like to see it in action? Click and play the following video clip to find out.
+
+[![Auto Fish Feeder Demo Video](images/top-image-for-youtube.png)](https://youtu.be/VEVzrsYeABg)
+
 The actual code has been tested by using the Wokwi simulator. Try it out!
 
 [Simulate this project with your favourite browser](https://wokwi.com/projects/394243023740323841)
