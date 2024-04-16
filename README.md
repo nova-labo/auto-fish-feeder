@@ -13,6 +13,11 @@ We have a rough plan as the following to get everything done by the end of upcom
 2. Take whatever we have prototyped in the virtual world to the real world after making sure everything is going to work as expected.
 3. Perform a few fine tuning and/or necessary hardware and software adjustments before finish it off.
 
+## System design and features
+The following diagram describes both the hardware components and software features which consist of the auto-fish-feeder system.
+
+![Auto Fish Feeder system diagram](images/aff-block-diagram.svg)
+
 ## Wokwi demo
 The actual code has been tested by using the Wokwi simulator. Try it out!
 
