@@ -34,27 +34,25 @@
 // ----- Header File Includes ----- //
 #include <Servo.h>
 
-#define DEBUG
+// #define DEBUG
 
 // ----- Preprocessor Directives ----- //
-#define BLINK_INTERVAL 1000     // [ms] Status led blink interval
 #ifdef DEBUG
-#define FEED_INTERVAL 5000      // [ms] Automatic feed interval for debugging purpose
+#define LED_STATUS 12       // Use external LED for easy debugging
+#define BLINK_INTERVAL 500  // [ms] Status led blink interval
+#define FEED_INTERVAL 5000  // [ms] Automatic feed interval for debugging purpose
 #else
-#define FEED_INTERVAL 259200000 // [ms] Automatic feed interval for normal operation
+#define LED_STATUS LED_BUILTIN   // Use interanl LED for saving electrical energy
+#define BLINK_INTERVAL 30000     // [ms] Status led blink interval
+#define FEED_INTERVAL 259200000  // [ms] Automatic feed interval for normal operation
 #endif
-#define SERVO_TIME 10           // [ms/degree] servo horn movement wait time per degree
+#define SERVO_TIME 10  // [ms/degree] servo horn movement wait time per degree
 
 // ----- Global Constants ----- //
-const byte SERVO_CTRL = 9;      // SG90 micro servo
-const byte PUSH_BUTTON = 2;     // Push button
-const byte CLOSE_ANGLE = 110;   // Close position angle
-const byte OPEN_ANGLE = 70;     // Open position angle
-#ifdef DEBUG
-const byte LED_STATUS = 12;            // Use external LED for easy debugging
-#else
-const byte LED_STATUS = LED_BUILTIN;   // Use interanl LED for saving electrical energy
-#endif
+const byte SERVO_CTRL = 9;     // SG90 micro servo
+const byte PUSH_BUTTON = 2;    // Push button
+const byte CLOSE_ANGLE = 115;  // Close position angle
+const byte OPEN_ANGLE = 70;    // Open position angle
 
 // ----- Global Variables ----- //
 volatile bool isButtonPushed = false;
@@ -73,6 +71,8 @@ void setup() {
   pinMode(LED_STATUS, OUTPUT);
   pinMode(PUSH_BUTTON, INPUT_PULLUP);
 
+  digitalWrite(LED_STATUS, LOW);
+
   // Configure SG90 micro servo
   sg90Servo.attach(SERVO_CTRL);
   sg90Servo.write(CLOSE_ANGLE);
@@ -89,19 +89,18 @@ void loop() {
   // Get current time
   currTime = millis();
 
-  // Blink status led for automatic mode
   if (!isButtonPushed && currTime - prevBlinkTime >= BLINK_INTERVAL) {
     prevBlinkTime = currTime;
-    digitalWrite(LED_STATUS, !digitalRead(LED_STATUS));
+    digitalWrite(LED_STATUS, HIGH);  // Blink status led for automatic mode
+    delay(SERVO_TIME);
   }
 
   // Open and close latch when button pushed manually
-  // Servo operation takes longer than 25msec, 
+  // Servo operation takes longer than 25msec,
   // we won't need to worry about signal bouncing caused by the momentary push button.
   if (isButtonPushed || currTime - prevFeedTime >= FEED_INTERVAL) {
     prevFeedTime = currTime;
-
-    digitalWrite(LED_STATUS, LOW);  // Blink status led for manual mode
+    digitalWrite(LED_STATUS, HIGH);  // Blink status led for manual mode
 
     for (sg90ServoPos = CLOSE_ANGLE; sg90ServoPos >= OPEN_ANGLE; sg90ServoPos--) {
       sg90Servo.write(sg90ServoPos);
@@ -113,9 +112,10 @@ void loop() {
       delay(SERVO_TIME);
     }
 
-    digitalWrite(LED_STATUS, HIGH); // Blink status led for manual mode
     isButtonPushed = false;
   }
+  
+  digitalWrite(LED_STATUS, LOW);
 }
 
 /*
