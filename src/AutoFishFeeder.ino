@@ -89,7 +89,7 @@ void loop() {
   // Get current time
   currTime = millis();
 
-  if (!isButtonPushed && currTime - prevBlinkTime >= BLINK_INTERVAL) {
+  if (!isButtonPushed && currTime - prevBlinkTime > BLINK_INTERVAL) {
     prevBlinkTime = currTime;
     digitalWrite(LED_STATUS, HIGH);  // Blink status led for automatic mode
     delay(SERVO_TIME);
@@ -98,7 +98,7 @@ void loop() {
   // Open and close latch when button pushed manually
   // Servo operation takes longer than 25msec,
   // we won't need to worry about signal bouncing caused by the momentary push button.
-  if (isButtonPushed || currTime - prevFeedTime >= FEED_INTERVAL) {
+  if (isButtonPushed || currTime - prevFeedTime > FEED_INTERVAL) {
     prevFeedTime = currTime;
     digitalWrite(LED_STATUS, HIGH);  // Blink status led for manual mode
 
