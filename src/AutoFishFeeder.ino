@@ -34,17 +34,17 @@
 // ----- Header File Includes ----- //
 #include <Servo.h>
 
-// #define DEBUG
+//#define DEBUG
 
 // ----- Preprocessor Directives ----- //
 #ifdef DEBUG
 #define LED_STATUS 12       // Use external LED for easy debugging
-#define BLINK_INTERVAL 500  // [ms] Status led blink interval
-#define FEED_INTERVAL 5000  // [ms] Automatic feed interval for debugging purpose
+const unsigned long BLINK_INTERVAL = 10000;  // [ms] Status led blink interval
+const unsigned long FEED_INTERVAL = 5000;  // [ms] Automatic feed interval for debugging purpose
 #else
 #define LED_STATUS LED_BUILTIN   // Use interanl LED for saving electrical energy
-#define BLINK_INTERVAL 30000     // [ms] Status led blink interval
-#define FEED_INTERVAL 259200000  // [ms] Automatic feed interval for normal operation
+const unsigned long BLINK_INTERVAL = 30000;     // [ms] Status led blink interval
+const unsigned long FEED_INTERVAL = 259200000;  // [ms] Automatic feed interval for normal operation
 #endif
 #define SERVO_TIME 10  // [ms/degree] servo horn movement wait time per degree
 
@@ -89,7 +89,7 @@ void loop() {
   // Get current time
   currTime = millis();
 
-  if (!isButtonPushed && currTime - prevBlinkTime > BLINK_INTERVAL) {
+  if (!isButtonPushed && currTime - prevBlinkTime >= BLINK_INTERVAL) {
     prevBlinkTime = currTime;
     digitalWrite(LED_STATUS, HIGH);  // Blink status led for automatic mode
     delay(SERVO_TIME);
@@ -98,7 +98,7 @@ void loop() {
   // Open and close latch when button pushed manually
   // Servo operation takes longer than 25msec,
   // we won't need to worry about signal bouncing caused by the momentary push button.
-  if (isButtonPushed || currTime - prevFeedTime > FEED_INTERVAL) {
+  if (isButtonPushed || currTime - prevFeedTime >= FEED_INTERVAL) {
     prevFeedTime = currTime;
     digitalWrite(LED_STATUS, HIGH);  // Blink status led for manual mode
 
