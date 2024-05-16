@@ -34,7 +34,7 @@
 // ----- Header File Includes ----- //
 #include <Servo.h>
 
-#define DEBUG
+// #define DEBUG
 
 // ----- Preprocessor Directives ----- //
 #ifdef DEBUG
