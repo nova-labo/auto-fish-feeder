@@ -34,25 +34,28 @@
 // ----- Header File Includes ----- //
 #include <Servo.h>
 
-//#define DEBUG
+#define DEBUG
 
 // ----- Preprocessor Directives ----- //
 #ifdef DEBUG
-#define LED_STATUS 12       // Use external LED for easy debugging
-const unsigned long BLINK_INTERVAL = 10000;  // [ms] Status led blink interval
-const unsigned long FEED_INTERVAL = 5000;  // [ms] Automatic feed interval for debugging purpose
+#define BLINK_INTERVAL 1000       // [ms] Status led blink interval
+#define FEED_INTERVAL 5000        // [ms] Automatic feed interval for debugging purpose
 #else
-#define LED_STATUS LED_BUILTIN   // Use interanl LED for saving electrical energy
-const unsigned long BLINK_INTERVAL = 30000;     // [ms] Status led blink interval
-const unsigned long FEED_INTERVAL = 259200000;  // [ms] Automatic feed interval for normal operation
+#define BLINK_INTERVAL 10000      // [ms] Status led blink interval
+#define FEED_INTERVAL 259200000   // [ms] Automatic feed interval for normal operation
 #endif
-#define SERVO_TIME 10  // [ms/degree] servo horn movement wait time per degree
+#define SERVO_TIME_PER_DEGREE 10  // [ms/degree] servo horn movement wait time per degree
 
 // ----- Global Constants ----- //
 const byte SERVO_CTRL = 9;     // SG90 micro servo
 const byte PUSH_BUTTON = 2;    // Push button
-const byte CLOSE_ANGLE = 115;  // Close position angle
+const byte CLOSE_ANGLE = 115;  // Close position angle (CLOSE_ANGLE >)
 const byte OPEN_ANGLE = 70;    // Open position angle
+#ifdef DEBUG
+const byte LED_STATUS = 12;  // Use external LED for easy debugging
+#else
+const byte LED_STATUS = LED_BUILTIN;  // Use interanl LED for saving electrical energy
+#endif
 
 // ----- Global Variables ----- //
 volatile bool isButtonPushed = false;
@@ -64,7 +67,7 @@ int sg90ServoPos = CLOSE_ANGLE;
 Servo sg90Servo;
 
 /*
-* Hardware setup & configurations to get things ready ;-)
+  Hardware setup & configurations to get things ready ;-)
 */
 void setup() {
   // Configure GPIO pins
@@ -76,14 +79,14 @@ void setup() {
   // Configure SG90 micro servo
   sg90Servo.attach(SERVO_CTRL);
   sg90Servo.write(CLOSE_ANGLE);
-  delay(SERVO_TIME);
+  asynDelayMilliseconds(SERVO_TIME_PER_DEGREE);
 
   // Configure push button interrupt
   attachInterrupt(digitalPinToInterrupt(PUSH_BUTTON), buttonPushed, FALLING);
 }
 
 /*
-* Super loop to get it work ;-)
+  Super loop to get it work ;-)
 */
 void loop() {
   // Get current time
@@ -91,36 +94,44 @@ void loop() {
 
   if (!isButtonPushed && currTime - prevBlinkTime >= BLINK_INTERVAL) {
     prevBlinkTime = currTime;
-    digitalWrite(LED_STATUS, HIGH);  // Blink status led for automatic mode
-    delay(SERVO_TIME);
+    digitalWrite(LED_STATUS, HIGH);
+    asynDelayMilliseconds(500);
+    digitalWrite(LED_STATUS, LOW);
+    asynDelayMilliseconds(500);
   }
-
-  // Open and close latch when button pushed manually
-  // Servo operation takes longer than 25msec,
-  // we won't need to worry about signal bouncing caused by the momentary push button.
+  
   if (isButtonPushed || currTime - prevFeedTime >= FEED_INTERVAL) {
     prevFeedTime = currTime;
-    digitalWrite(LED_STATUS, HIGH);  // Blink status led for manual mode
 
-    for (sg90ServoPos = CLOSE_ANGLE; sg90ServoPos >= OPEN_ANGLE; sg90ServoPos--) {
+    for (sg90ServoPos = sg90Servo.read(); sg90ServoPos >= OPEN_ANGLE; sg90ServoPos--) {
       sg90Servo.write(sg90ServoPos);
-      delay(SERVO_TIME);
+      asynDelayMilliseconds(SERVO_TIME_PER_DEGREE);
     }
 
-    for (sg90ServoPos = OPEN_ANGLE; sg90ServoPos <= CLOSE_ANGLE; sg90ServoPos++) {
+    for (sg90ServoPos = sg90Servo.read(); sg90ServoPos <= CLOSE_ANGLE; sg90ServoPos++) {
       sg90Servo.write(sg90ServoPos);
-      delay(SERVO_TIME);
+      asynDelayMilliseconds(SERVO_TIME_PER_DEGREE);
     }
 
     isButtonPushed = false;
   }
-  
-  digitalWrite(LED_STATUS, LOW);
 }
 
 /*
-* Interrupt Service Routine for the push button
+  Interrupt Service Routine for the push button
 */
 void buttonPushed() {
+  noInterrupts(); // disable intterrupts for updating flag atomically
   isButtonPushed = true;
+  interrupts(); // re-enable interrupts
+}
+
+/*
+  Asynchronous non-blocking wait in milliseconds
+*/
+void asynDelayMilliseconds(unsigned long duration) {
+  unsigned long startTime = millis();
+  while(millis() - startTime < duration) {
+    // do nothing but wait
+  };
 }
