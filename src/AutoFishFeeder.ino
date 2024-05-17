@@ -34,7 +34,7 @@
 // ----- Header File Includes ----- //
 #include <Servo.h>
 
-// #define DEBUG
+//#define DEBUG
 
 // ----- Preprocessor Directives ----- //
 #ifdef DEBUG
@@ -92,6 +92,7 @@ void loop() {
   // Get current time
   currTime = millis();
 
+  // Blink status led to indicate proper execution
   if (!isButtonPushed && currTime - prevBlinkTime >= BLINK_INTERVAL) {
     prevBlinkTime = currTime;
     digitalWrite(LED_STATUS, HIGH);
@@ -100,6 +101,8 @@ void loop() {
     asynDelayMilliseconds(500);
   }
   
+  // Open and close latch for feeding control either triggered manually by push button 
+  // or automatically by timer
   if (isButtonPushed || currTime - prevFeedTime >= FEED_INTERVAL) {
     prevFeedTime = currTime;
 
@@ -132,6 +135,6 @@ void buttonPushed() {
 void asynDelayMilliseconds(unsigned long duration) {
   unsigned long startTime = millis();
   while(millis() - startTime < duration) {
-    // do nothing but wait
-  };
+
+  }
 }
